@@ -30,8 +30,9 @@
   ],
   "whiteListMode": {
     "enable": false,
-    "whiteListIds": ["",
-"",
+    "whiteListIds": [
+      "",
+      "",
       ""
     ],
     "notes": "if you enable this feature, only the ids in the whiteListIds list can use the bot"
@@ -154,4 +155,4 @@
     "autoReconnect": false,
     "notes": "Document here: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions "
   }
-  }
+}
