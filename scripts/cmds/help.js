@@ -5,7 +5,7 @@ module.exports = {
   config: Object.freeze({
     name: "help",
     version: "1.20",
-    author: "BaYjid",
+    author: "𝗕𝗔𝗗𝗛𝗢𝗡 𝗥𝗢𝗛𝗠𝗔𝗡 💀✨",
     countDown: 5,
     role: 0,
     shortDescription: { en: "📖 View command usage" },
@@ -22,7 +22,7 @@ module.exports = {
     if (args.length === 0) {
       const categories = {};
       let msg = `╭━━━━━━━━━━━━━━━━━╮\n` +
-                `      👽𝗠𝗮𝗹𝘃𝗶𝗻𝗮👽      \n` +
+                `      -`ღ´🦋𝗠𝗲𝗹𝗶𝘀𝗮🍒🥂      \n` +
                 `╰━━━━━━━━━━━━━━━━━╯\n\n`;
 
       for (const [name, value] of commands) {
@@ -81,4 +81,4 @@ function roleTextToString(role) {
     case 2: return "🤖 Bot Admins";
     default: return "❓ Unknown Role";
   }
-}
+        }
