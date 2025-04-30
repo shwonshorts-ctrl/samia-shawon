@@ -11,7 +11,7 @@ module.exports = {
     shortDescription: { en: "📖 View command usage" },
     longDescription: { en: "📜 View command usage and list all commands directly" },
     category: "ℹ️ Info",
-    guide: { en: "🔹 {pn} / help cmdName" },
+    guide: { en: "🔹 {pn}help / {pn}help cmdName" },
     priority: 1,
   }),
 
@@ -22,25 +22,27 @@ module.exports = {
     if (args.length === 0) {
       const categories = {};
       let msg = `╭━━━━━━━━━━━━━━━━━╮\n` +
-                `      -`ღ´🦋𝗠𝗲𝗹𝗶𝘀𝗮🍒🥂      \n` +
+                `│   -ღ´🦋𝗠𝗲𝗹𝗶𝘀𝗮🍒🥂\n` +
                 `╰━━━━━━━━━━━━━━━━━╯\n\n`;
 
       for (const [name, value] of commands) {
-        if (value.config.role > 1 && role < value.config.role) continue;
+        if (value.config.role > role) continue;
         const category = value.config.category || "Uncategorized";
         if (!categories[category]) categories[category] = [];
         categories[category].push(name);
       }
 
       Object.keys(categories).forEach((category) => {
-        msg += `╭━ 📂 ★${category.toUpperCase()}\n`;
-        categories[category].sort().forEach((item) => msg += ` 🔹 ${item}\n`);
+        msg += `╭━ 📂 ${category.toUpperCase()}\n`;
+        categories[category].sort().forEach((item) => {
+          msg += `│ 🔹 ${item}\n`;
+        });
         msg += `╰━━━━━━━━━━━━━━╯\n\n`;
       });
 
       msg += `╭━━━━━━━━━━━━━━━╮\n` +
              `┃ 📌 Total Commands: ${commands.size}\n` +
-             `┃ 🔹 Type: ★"${prefix}help cmdName"★ for details.\n` +
+             `┃ 🔹 Type: ${prefix}help [cmdName]\n` +
              `╰━━━━━━━━━━━━━━━╯`;
 
       await message.reply(msg);
@@ -49,27 +51,29 @@ module.exports = {
       const command = commands.get(commandName) || commands.get(aliases.get(commandName));
 
       if (!command) {
-        await message.reply(`❌ Command "*${commandName}*" not found.`);
-      } else {
-        const configCommand = command.config;
-        const roleText = roleTextToString(configCommand.role);
-        const author = configCommand.author || "Unknown";
-        const longDescription = configCommand.longDescription?.en || "No description available.";
-        const guideBody = configCommand.guide?.en || "No guide available.";
-        const usage = guideBody.replace(/{pn}/g, prefix).replace(/{n}/g, configCommand.name);
-
-        const response = `─━ 📌 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐈𝐍𝐅𝐎 ━─\n` +
-                         ` 🔹 Name: ${configCommand.name}\n` +
-                         ` 📜 Description: ${longDescription}\n` +
-                         ` 🆔 Aliases: ${configCommand.aliases ? configCommand.aliases.join(", ") : "None"}\n` +
-                         ` 📎 Version: ${configCommand.version || "1.0"}\n` +
-                         ` 👤 Role: ${roleText}\n` +
-                         ` ⏳ Cooldown: ${configCommand.countDown || "1"}s\n` +
-                         ` 👨‍💻 Author: ${author}\n` +
-                         ` 📖 Usage: ${usage}\n` +
-                         `━━━━━━━━━━━━━━━━━━━━`;
-        await message.reply(response);
+        return await message.reply(`❌ Command "*${commandName}*" not found.`);
       }
+
+      const configCommand = command.config;
+      const roleText = roleTextToString(configCommand.role);
+      const author = configCommand.author || "Unknown";
+      const longDescription = configCommand.longDescription?.en || "No description available.";
+      const guideBody = configCommand.guide?.en || "No guide available.";
+      const usage = guideBody.replace(/{pn}/g, prefix).replace(/{n}/g, configCommand.name);
+      const aliasList = aliases.get(configCommand.name) || [];
+
+      const response = `─━ 📌 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐈𝐍𝐅𝐎 ━─\n` +
+                       `🔹 Name: ${configCommand.name}\n` +
+                       `📜 Description: ${longDescription}\n` +
+                       `🆔 Aliases: ${aliasList.length ? aliasList.join(", ") : "None"}\n` +
+                       `📎 Version: ${configCommand.version || "1.0"}\n` +
+                       `👤 Role: ${roleText}\n` +
+                       `⏳ Cooldown: ${configCommand.countDown || "1"}s\n` +
+                       `👨‍💻 Author: ${author}\n` +
+                       `📖 Usage: ${usage}\n` +
+                       `━━━━━━━━━━━━━━━━━━━━`;
+
+      await message.reply(response);
     }
   },
 };
@@ -81,4 +85,4 @@ function roleTextToString(role) {
     case 2: return "🤖 Bot Admins";
     default: return "❓ Unknown Role";
   }
-        }
+  }
