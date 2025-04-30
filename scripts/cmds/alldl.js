@@ -1,72 +1,70 @@
 const axios = require("axios");
-const fs = require("fs-extra");
-const baseApiUrl = async () => {
-  const base = await axios.get(
-    `https://raw.githubusercontent.com/Blankid018/D1PT0/main/baseApiUrl.json`,
-  );
-  return base.data.api;
-};
+const fs = require("fs");
+const { shortenURL } = global.utils;
+
+const nusu = "https://rasin-x-apis-main.onrender.com/api/rasin/autodl?url=";
 
 module.exports = {
   config: {
-    name: "alldl",
-    version: "1.0.5",
-    author: "Dipto",
-    countDown: 2,
+    name: "autodl",
+    version: "1.0.3",
+    author: "Rasin",
+    countDown: 0,
     role: 0,
     description: {
-      en: "𝗗𝗼𝘄𝗻𝗹𝗼𝗮𝗱 𝘃𝗶𝗱𝗲𝗼 𝗳𝗿𝗼𝗺 𝘁𝗶𝗸𝘁𝗼𝗸, 𝗳𝗮𝗰𝗲𝗯𝗼𝗼𝗸, 𝗜𝗻𝘀𝘁𝗮𝗴𝗿𝗮𝗺, 𝗬𝗼𝘂𝗧𝘂𝗯𝗲, 𝗮𝗻𝗱 𝗺𝗼𝗿𝗲",
+      en: "empty ()",
     },
-    category: "𝗠𝗘𝗗𝗜𝗔",
+    category: "downloader",
     guide: {
-      en: "[video_link]",
+      en: "video link",
     },
   },
-  onStart: async function ({ api, args, event }) {
-    const dipto = event.messageReply?.body || args[0];
-    if (!dipto) {
-      api.setMessageReaction("❌", event.messageID, (err) => {}, true);
-    }
+
+  onStart: async function () {},
+
+  onChat: async function ({ api, event }) {
+    let rasin = event.body ? event.body.trim() : "";
+
     try {
-      api.setMessageReaction("⏳", event.messageID, (err) => {}, true);
-      const { data } = await axios.get(`${await baseApiUrl()}/alldl?url=${encodeURIComponent(dipto)}`);
-      const filePath = __dirname + `/cache/vid.mp4`;
-      if(!fs.existsSync(filePath)){
-        fs.mkdir(__dirname + '/cache');
-      }
-      const vid = (
-        await axios.get(data.result, { responseType: "arraybuffer" })
-      ).data;
-      fs.writeFileSync(filePath, Buffer.from(vid, "utf-8"));
-      const url = await global.utils.shortenURL(data.result);
-      api.setMessageReaction("✅", event.messageID, (err) => {}, true);
-      api.sendMessage({
-          body: `${data.cp || null}\nLink = ${url || null}`,
-          attachment: fs.createReadStream(filePath),
-        },
-        event.threadID,
-        () => fs.unlinkSync(filePath),
-        event.messageID
-      );
-      if (dipto.startsWith("https://i.imgur.com")) {
-        const dipto3 = dipto.substring(dipto.lastIndexOf("."));
-        const response = await axios.get(dipto, {
-          responseType: "arraybuffer",
+      if (
+        rasin.startsWith("https://vt.tiktok.com") ||
+        rasin.startsWith("https://www.tiktok.com/") ||
+        rasin.startsWith("https://www.facebook.com") ||
+        rasin.startsWith("https://www.instagram.com/") ||
+        rasin.startsWith("https://youtu.be/") ||
+        rasin.startsWith("https://youtube.com/") ||
+        rasin.startsWith("https://twitter.com/") ||
+        rasin.startsWith("https://vm.tiktok.com") ||
+        rasin.startsWith("https://fb.watch")
+      ) {
+        api.setMessageReaction("🌚", event.messageID, (err) => {}, true);
+
+        const path = __dirname + "/cache/video.mp4";
+        
+        const videoStream = await axios({
+          url: `${nusu}${encodeURIComponent(rasin)}`,
+          method: "GET",
+          responseType: "stream",
         });
-        const filename = __dirname + `/cache/dipto${dipto3}`;
-        fs.writeFileSync(filename, Buffer.from(response.data, "binary"));
-        api.sendMessage({
-            body: `✅ | Downloaded from link`,
-            attachment: fs.createReadStream(filename),
-          },
-          event.threadID,
-          () => fs.unlinkSync(filename),
-          event.messageID,
-        );
+        
+        const writer = fs.createWriteStream(path);
+        videoStream.data.pipe(writer);
+        
+        writer.on("finish", async () => {
+          api.sendMessage(
+            {
+              body: "🌟 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐯𝐢𝐝𝐞𝐨",
+              attachment: fs.createReadStream(path),
+            },
+            event.threadID,
+            () => fs.unlinkSync(path),
+            event.messageID
+          );
+        });
       }
-    } catch (error) {
+    } catch (e) {
       api.setMessageReaction("❎", event.messageID, (err) => {}, true);
-      api.sendMessage(error.message, event.threadID, event.messageID);
+      api.sendMessage(`Error: ${e.message}`, event.threadID, event.messageID);
     }
   },
 };
