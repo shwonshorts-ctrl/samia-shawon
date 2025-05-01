@@ -4,7 +4,7 @@ module.exports.config = {
   name: 'autotime',
   version: "2.0.0",
   role: 0,
-  author: "MR᭄﹅ MAHABUB﹅ メꪜ",
+  author: "𝗕𝗔𝗗𝗛𝗢𝗡",
   description: "Sends scheduled messages based on time",
   category: "AutoTime",
   countDown: 3
