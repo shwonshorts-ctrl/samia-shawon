@@ -81,7 +81,7 @@ module.exports = {
 ├───〔 ✨ Quote of the Moment 〕───
 │ ${randomQuote}
 │
-╰───〔 ❤️ Powered by BADHON 💀✨ 〕───╯
+╰───〔 ❤️ Powered by BADHON💀 〕───╯
 `;
 
       await delay(500);
