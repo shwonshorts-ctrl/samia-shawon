@@ -37,7 +37,7 @@ module.exports = {
         rasin.startsWith("https://vm.tiktok.com") ||
         rasin.startsWith("https://fb.watch")
       ) {
-        api.setMessageReaction("🌚", event.messageID, (err) => {}, true);
+        api.setMessageReaction("🟢", event.messageID, (err) => {}, true);
 
         const path = __dirname + "/cache/video.mp4";
         
