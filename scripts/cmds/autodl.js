@@ -1,71 +1,64 @@
 const axios = require("axios");
 const fs = require("fs");
-const { shortenURL } = global.utils;
-
-const nusu = "https://rasin-x-apis-main.onrender.com/api/rasin/autodl?url=";
+const path = require("path");
 
 module.exports = {
   config: {
-    name: "autodl",
-    version: "1.0.3",
-    author: "Rasin",
-    countDown: 0,
+    name: "autodown",
+    aliases: ["autodl"],
+    version: "1.6.9",
+    author: "Nazrul",
     role: 0,
-    description: {
-      en: "empty ()",
-    },
-    category: "downloader",
-    guide: {
-      en: "video link",
-    },
+    description: "Auto-download media from any  platform",
+    category: "media",
+    guide: { en: "Send any media link" }
   },
 
-  onStart: async function () {},
+  onStart: async function({}) {},
 
-  onChat: async function ({ api, event }) {
-    let rasin = event.body ? event.body.trim() : "";
+  onChat: async function({ api, event }) {
+    const url = event.body?.match(/https?:\/\/[^\s]+/)?.[0];
+    if (!url) return;
 
     try {
-      if (
-        rasin.startsWith("https://vt.tiktok.com") ||
-        rasin.startsWith("https://www.tiktok.com/") ||
-        rasin.startsWith("https://www.facebook.com") ||
-        rasin.startsWith("https://www.instagram.com/") ||
-        rasin.startsWith("https://youtu.be/") ||
-        rasin.startsWith("https://youtube.com/") ||
-        rasin.startsWith("https://twitter.com/") ||
-        rasin.startsWith("https://vm.tiktok.com") ||
-        rasin.startsWith("https://fb.watch")
-      ) {
-        api.setMessageReaction("🌚", event.messageID, (err) => {}, true);
+      api.setMessageReaction("🦆", event.messageID, () => {}, true);
 
-        const path = __dirname + "/cache/video.mp4";
-        
-        const videoStream = await axios({
-          url: ${nusu}${encodeURIComponent(rasin)},
-          method: "GET",
-          responseType: "stream",
-        });
-        
-        const writer = fs.createWriteStream(path);
-        videoStream.data.pipe(writer);
-        
-        writer.on("finish", async () => {
-          api.sendMessage(
-            {
-              body: "🌟 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐯𝐢𝐝𝐞𝐨",
-              attachment: fs.createReadStream(path),
-            },
-            event.threadID,
-            () => fs.unlinkSync(path),
-            event.messageID
-          );
-        });
-      }
+      const apiUrl = (await axios.get("https://raw.githubusercontent.com/nazrul4x/Noobs/main/Apis.json")).data.api;
+      const { data } = await axios.get(`${apiUrl}/nazrul/alldlxx?url=${encodeURIComponent(url)}`);
+      
+      if (!data.url) throw new Error(data.error || "No download link found");
+
+      const filePath = path.join(__dirname, `n_${Date.now()}.mp4`);
+      const writer = fs.createWriteStream(filePath);
+      const response = await axios({
+        url: data.url,
+        method: 'GET',
+        responseType: 'stream',
+        headers: {
+          'User-Agent': 'Mozilla/5.0',
+          'Accept': '*/*',
+          'Connection': 'keep-alive'
+        }
+      });
+
+      response.data.pipe(writer);
+
+      await new Promise((resolve, reject) => {
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      });
+
+      await api.sendMessage({
+        body: `${data.t}\n🛠️ Platform: ${data.p}`,
+        attachment: fs.createReadStream(filePath)
+      }, event.threadID);
+
+      fs.unlink(filePath, () => {});
+      api.setMessageReaction("✅", event.messageID, () => {}, true);
+
     } catch (e) {
-      api.setMessageReaction("❎", event.messageID, (err) => {}, true);
-      api.sendMessage(Error: ${e.message}, event.threadID, event.messageID);
+      api.setMessageReaction("❌", event.messageID, () => {}, true);
+      console.log(e.message);
     }
-  },
+  }
 };
-rasin-x-apis-main.onrender.com
