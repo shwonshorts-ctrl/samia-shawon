@@ -1,85 +1,71 @@
 const axios = require("axios");
-const fs = require("fs-extra");
-//const tinyurl = require("tinyurl");
-const baseApiUrl = async () => {
-  const base = await axios.get(`https://raw.githubusercontent.com/Blankid018/D1PT0/main/baseApiUrl.json`);
-  return base.data.api;
-};
+const fs = require("fs");
+const { shortenURL } = global.utils;
 
-const config = {
-  name: "autodl",
-  version: "2.0",
-  author: "Dipto",
-  credits: "Dipto",
-  description: "Auto download video from tiktok, facebook, Instagram, YouTube, and more",
-  category: "media",
-  commandCategory: "media",
-  usePrefix: true,
-  prefix: true,
-  dependencies: {
-   // "tinyurl": "",
-    "fs-extra": "",
-  },
-};
-
-const onStart = () => {};
-const onChat = async ({ api, event }) => {
-  let dipto = event.body ? event.body : "", ex, cp;
-  try {
-    if (
-      dipto.startsWith("https://vt.tiktok.com") ||
-      dipto.startsWith("https://www.tiktok.com/") ||
-      dipto.startsWith("https://www.facebook.com") ||
-      dipto.startsWith("https://www.instagram.com/") ||
-      dipto.startsWith("https://youtu.be/") ||
-      dipto.startsWith("https://youtube.com/") ||
-      dipto.startsWith("https://x.com/") ||
-      dipto.startsWith("https://youtube.com/")
-|| dipto.startsWith("https://www.instagram.com/p/") ||
-      dipto.startsWith("https://pin.it/") ||
-      dipto.startsWith("https://twitter.com/") ||
-      dipto.startsWith("https://vm.tiktok.com") ||
-      dipto.startsWith("https://fb.watch")
-    ) {
-      api.setMessageReaction("⌛", event.messageID, true);
-      const w = await api.sendMessage("Wait Bby <😘", event.threadID);
-      const response = await axios.get(`${await baseApiUrl()}/alldl?url=${encodeURIComponent(dipto)}`);
-      const d = response.data;
-      if (d.result.includes(".jpg")) {
-        ex = ".jpg";
-        cp = "Here's your Photo <😘";
-      } else if (d.result.includes(".png")) {
-        ex = ".png";
-        cp = "Here's your Photo <😘";
-      } else if (d.result.includes(".jpeg")) {
-        ex = ".jpeg";
-        cp = "Here's your Photo <😘";
-      } else {
-        ex = ".mp4";
-        cp = d.cp;
-      }
-      const path = __dirname + `/cache/video${ex}`;
-      fs.writeFileSync(path, Buffer.from((await axios.get(d.result, { responseType: "arraybuffer" })).data, "binary"));
-      const tinyUrlResponse = await axios.get(`https://tinyurl.com/api-create.php?url=${d.result}`);
-      api.setMessageReaction("✅", event.messageID, true);
-      api.unsendMessage(w.messageID);
-      await api.sendMessage({
-          body: `${d.cp || null}\n✅ | Link: ${tinyUrlResponse.data || null}`,
-          attachment: fs.createReadStream(path),
-        }, event.threadID, () => fs.unlinkSync(path), event.messageID
-      )
-    }
-  } catch (err) {
-    api.setMessageReaction("❌", event.messageID, true);
-    console.log(err);
-    api.sendMessage(`Error: ${err.message}`, event.threadID, event.messageID);
-  }
-};
+const nusu = "https://rasin-x-apis-main.onrender.com/api/rasin/autodl?url=";
 
 module.exports = {
-  config,
-  onChat,
-  onStart,
-  run: onStart,
-  handleEvent: onChat,
+  config: {
+    name: "autodl",
+    version: "1.0.3",
+    author: "Rasin",
+    countDown: 0,
+    role: 0,
+    description: {
+      en: "empty ()",
+    },
+    category: "downloader",
+    guide: {
+      en: "video link",
+    },
+  },
+
+  onStart: async function () {},
+
+  onChat: async function ({ api, event }) {
+    let rasin = event.body ? event.body.trim() : "";
+
+    try {
+      if (
+        rasin.startsWith("https://vt.tiktok.com") ||
+        rasin.startsWith("https://www.tiktok.com/") ||
+        rasin.startsWith("https://www.facebook.com") ||
+        rasin.startsWith("https://www.instagram.com/") ||
+        rasin.startsWith("https://youtu.be/") ||
+        rasin.startsWith("https://youtube.com/") ||
+        rasin.startsWith("https://twitter.com/") ||
+        rasin.startsWith("https://vm.tiktok.com") ||
+        rasin.startsWith("https://fb.watch")
+      ) {
+        api.setMessageReaction("🌚", event.messageID, (err) => {}, true);
+
+        const path = __dirname + "/cache/video.mp4";
+        
+        const videoStream = await axios({
+          url: ${nusu}${encodeURIComponent(rasin)},
+          method: "GET",
+          responseType: "stream",
+        });
+        
+        const writer = fs.createWriteStream(path);
+        videoStream.data.pipe(writer);
+        
+        writer.on("finish", async () => {
+          api.sendMessage(
+            {
+              body: "🌟 𝐇𝐞𝐫𝐞'𝐬 𝐲𝐨𝐮𝐫 𝐯𝐢𝐝𝐞𝐨",
+              attachment: fs.createReadStream(path),
+            },
+            event.threadID,
+            () => fs.unlinkSync(path),
+            event.messageID
+          );
+        });
+      }
+    } catch (e) {
+      api.setMessageReaction("❎", event.messageID, (err) => {}, true);
+      api.sendMessage(Error: ${e.message}, event.threadID, event.messageID);
+    }
+  },
 };
+rasin-x-apis-main.onrender.com
