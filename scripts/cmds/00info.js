@@ -4,8 +4,8 @@ const path = require("path");
 
 module.exports = {
   config: {
-    name: "botinfo",
-    aliases: ["info", "btinfo"],
+    name: "info",
+    aliases: ["info"],
     version: "1.0",
     author: "BADHON",
     role: 0,
@@ -13,7 +13,7 @@ module.exports = {
       en: "Get the Bot information such as uptime, ping, and group info."
     },
     longDescription: {
-      en: "Get the Bot information such as uptime, ping, and group info."
+      en: "Displays bot uptime, ping, and information about the current group."
     },
     category: "Info",
     guide: {
@@ -21,69 +21,63 @@ module.exports = {
     }
   },
 
-  onStart: async function ({ api, event, args, usersData, threadsData }) {
+  onStart: async function ({ api, event, usersData, threadsData }) {
     try {
-      // Download image from Imgur
-      const imgURL = "https://i.imgur.com/uSfFuCp.jpeg";
-      const imgPath = path.join(__dirname, "botinfo.png");
+      // Download image from Google Drive
+      const imgURL = "https://drive.google.com/uc?id=1ljWhOX2lARfuGarU8HpP1vDNq___pxpO";
+      const imgPath = path.join(__dirname, "botinfo.jpg");
       const response = await axios.get(imgURL, { responseType: "arraybuffer" });
       fs.writeFileSync(imgPath, Buffer.from(response.data, "binary"));
 
-      // Group info
-      let threadInfo = await api.getThreadInfo(event.threadID);
-      let threadMem = threadInfo.participantIDs.length;
-      let maleCount = 0, femaleCount = 0;
+      // Get thread info
+      const threadInfo = await api.getThreadInfo(event.threadID);
+      const threadMem = threadInfo.participantIDs.length;
+      const messageCount = threadInfo.messageCount || 0;
+      const threadName = threadInfo.threadName || "Unnamed Group";
+      const threadID = threadInfo.threadID;
+      const adminIDs = threadInfo.adminIDs || [];
+      const qtvCount = adminIDs.length;
 
-      for (let user of threadInfo.userInfo) {
+      // Count gender
+      let maleCount = 0, femaleCount = 0;
+      for (const user of threadInfo.userInfo) {
         if (user.gender === "MALE") maleCount++;
         else if (user.gender === "FEMALE") femaleCount++;
       }
 
-      let qtvList = threadInfo.adminIDs;
-      let qtvCount = qtvList.length;
-      let messageCount = threadInfo.messageCount;
-      let threadName = threadInfo.threadName;
-      let threadID = threadInfo.threadID;
-
-      let adminNames = '';
-      for (let admin of qtvList) {
-        let info = await api.getUserInfo(admin.id);
-        adminNames += `• ${info[admin.id].name}\n`;
+      // Get admin names
+      let adminNames = "";
+      for (const admin of adminIDs) {
+        const info = await api.getUserInfo(admin.id);
+        adminNames += `• ${info[admin.id]?.name || "Unknown"}\n`;
       }
 
-      const allUsers = await usersData.getAll();
-      const allThreads = await threadsData.getAll();
-
+      // Bot uptime
       const uptime = process.uptime();
       const hours = Math.floor(uptime / 3600);
       const minutes = Math.floor((uptime % 3600) / 60);
       const seconds = Math.floor(uptime % 60);
       const uptimeString = `${hours}Hrs ${minutes}min ${seconds}sec`;
 
+      // Ping
       const timeStart = Date.now();
       await api.sendMessage("𝗖𝗵𝗲𝗰𝗸𝗶𝗻𝗴 𝗕𝗼𝘁'𝘀 𝗜𝗻𝗳𝗼...", event.threadID);
       const ping = Date.now() - timeStart;
 
-      const message = `╭────────────────⭓
+      // Message
+      const message = `╭───── 𝗕𝗢𝗧 𝗜𝗡𝗙𝗢 ─────⭓
 ├─「𝐔𝐏𝐓𝐈𝐌𝐄」
-│» 𝗕𝗼𝘁 𝗥𝘂𝗻𝗻𝗶𝗻𝗴 𝗶𝗻 
-│${uptimeString}.
-├────────────────
+│» ${uptimeString}
 ├─「𝐏𝐈𝐍𝐆」
-│» 𝗧𝗵𝗲 𝗖𝘂𝗿𝗿𝗲𝗻𝘁 𝗣𝗶𝗻𝗴 𝗜𝘀:
-│${ping}ms.
-├────────────────
-├─「𝐆𝐑𝐎𝐔𝐏 𝐈𝐧𝐟𝐨」
-│» 𝗚𝗖 𝗡𝗮𝗺𝗲: 
-│${threadName}
-│» 𝗚𝗿𝗼𝘂𝗽 𝗜𝗗: 
-│${threadID}
-│» 𝗡𝘂𝗺𝗯𝗲𝗿 𝗼𝗳 𝗠𝗲𝗺𝗯𝗲𝗿:
-│${threadMem}
-│» 𝗠𝗮𝗹𝗲: ${maleCount} | 𝗙𝗲𝗺𝗮𝗹𝗲: ${femaleCount}
-│» 𝗔𝗱𝗺𝗶𝗻𝘀: ${qtvCount}
-│» 𝗠𝗲𝘀𝘀𝗮𝗴𝗲𝘀: ${messageCount}
-╰────────────────⭓`;
+│» ${ping}ms
+├─「𝐆𝐑𝐎𝐔𝐏 𝐈𝐍𝐅𝐎」
+│» Name: ${threadName}
+│» ID: ${threadID}
+│» Members: ${threadMem}
+│» Male: ${maleCount} | Female: ${femaleCount}
+│» Admins: ${qtvCount}
+│» Messages: ${messageCount}
+╰────────────────────⭓`;
 
       // Send message with attachment
       api.sendMessage(
@@ -92,12 +86,12 @@ module.exports = {
           attachment: fs.createReadStream(imgPath)
         },
         event.threadID,
-        () => fs.unlinkSync(imgPath) // delete after sending
+        () => fs.unlinkSync(imgPath) // Clean up after sending
       );
 
     } catch (error) {
-      console.error(error);
-      api.sendMessage("An error occurred while retrieving data.", event.threadID);
+      console.error("ERROR in ts.js:", error);
+      api.sendMessage(`An error occurred: ${error.message}`, event.threadID);
     }
   }
 };
