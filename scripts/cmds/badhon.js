@@ -1,10 +1,10 @@
-const axios = require("axios");
+^cmd install badhon.js const axios = require("axios");
 
 module.exports = {
   config: {
     name: "badhon",
     version: "1.0",
-    author: "💋𝗠𝗢𝗦𝗧𝗔𝗞𝗜𝗠 × 𝗕𝗔𝗗𝗛𝗢𝗡💀",
+    author: "💋𝗠𝗢𝗦𝗧𝗔𝗞𝗜𝗠 × 𝗕𝗔𝐃𝐇𝗢𝐍💀",
     countDown: 5,
     role: 0,
     shortDescription: "sarcasm",
@@ -65,10 +65,10 @@ module.exports = {
 
     if (triggers.includes(input)) {
       const randomReply = replies[Math.floor(Math.random() * replies.length)];
-      const url = "https://drive.google.com/file/d/1Chgk8FX12BF4lgsPFCmh053qJqXOw4CN/view?usp=drivesdk";
+      const fileUrl = "https://drive.google.com/uc?export=download&id=1Chgk8FX12BF4lgsPFCmh053qJqXOw4CN";
 
       try {
-        const response = await axios.get(url, { responseType: "stream" });
+        const response = await axios.get(fileUrl, { responseType: "stream" });
         return message.reply({
           body: randomReply,
           attachment: response.data
