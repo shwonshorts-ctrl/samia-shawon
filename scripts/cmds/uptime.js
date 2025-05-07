@@ -70,7 +70,7 @@ module.exports = {
 │ [ ${uptimeProgressBar} ] (${uptimePercent}%)
 │
 │ ⚡ Ping: ${ping}ms
-│ 🤖 Bot Name: ღ´🦋𝗠𝗲𝗹𝗶𝘀𝗮🍒🥂
+│ 🤖 Bot Name: Melisa
 │ 🛠️ Version: v1.0
 │
 ├───〔 🔧 System Status 〕───
@@ -81,7 +81,7 @@ module.exports = {
 ├───〔 ✨ Quote of the Moment 〕───
 │ ${randomQuote}
 │
-╰───〔 ❤️ Powered by BADHON💀 〕───╯
+╰──〔 ❤️ Powered by BADHON 💀✨ 〕─╯
 `;
 
       await delay(500);
