@@ -96,7 +96,7 @@
   },
   "autoRefreshFbstate": true,
   "autoReloginWhenChangeAccount": true,
-  "autoRestartWhenListenMqttError": true,
+  "autoRestartWhenListenMqttError": false,
   "restartListenMqtt": {
     "enable": true,
     "timeRestart": 1800000,
