@@ -24,7 +24,7 @@ module.exports = {
   onStart: async function ({ api, event, usersData, threadsData }) {
     try {
       // Download image from Google Drive
-      const imgURL = "https://drive.google.com/uc?id=1EJia7JaD_HUksoIBy3Wxn45XLzc8v_8Y";
+      const imgURL = "https://drive.google.com/uc?id=1ljWhOX2lARfuGarU8HpP1vDNq___pxpO";
       const imgPath = path.join(__dirname, "botinfo.jpg");
       const response = await axios.get(imgURL, { responseType: "arraybuffer" });
       fs.writeFileSync(imgPath, Buffer.from(response.data, "binary"));
