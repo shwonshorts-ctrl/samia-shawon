@@ -1,104 +1,99 @@
-const { getTime, drive } = global.utils;
+// Required modules
+const fs = require('fs-extra');
+const axios = require('axios');
+const jimp = require('jimp');
+const { loadImage, createCanvas, registerFont } = require('canvas');
+const moment = require('moment-timezone');
 
-if (!global.temp.welcomeEvent) global.temp.welcomeEvent = {};
+// Configurable values
+const ADMIN_NAME = "BADHON"; // BADHON in Math Bold
+const BOT_NAME = "MELISA🦋🍓"; // MELISA in Math Italic
+const FONT_LINK = 'https://drive.google.com/u/0/uc?id=1ZwFqYB-x6S9MjPfYm3t3SP1joohGl4iw&export=download';
 
 module.exports = {
-	config: {
-		name: "welcome",
-		version: "2.0",
-		author: "BaYjid",
-		category: "events"
-	},
+  config: {
+    name: "Welcome",
+    version: "1.0.0",
+    description: "Sends a welcome image when someone joins the group",
+    eventType: ["log:subscribe"],
+    credits: "DIPTO MIRAI CONVERTED IN GOATBOT BY BADHON"
+  },
 
-	langs: {
-		vi: {
-			session1: "☀ 𝗦𝗮́𝗻𝗴",
-			session2: "⛅ 𝗧𝗿𝘂̛𝗮",
-			session3: "🌆 𝗖𝗵𝗶𝗲̂̀𝘂",
-			session4: "🌙 𝗧𝗼̂́𝗶",
-			welcomeMessage: "✨ 𝗖𝗮̉𝗺 𝗼̛𝗻 𝗯𝗮̣𝗻 𝗱𝗮̃ 𝗺𝗼̛̀𝗶 𝘁𝗼̂𝗶 𝘃𝗮̀𝗼 𝗻𝗵𝗼́𝗺!\n⚡ 𝗣𝗿𝗲𝗳𝗶𝘅 𝗯𝗼𝘁: %1\n🔎 Đ𝗲̂̉ 𝘅𝗲𝗺 𝗱𝗮𝗻𝗵 𝘀𝗮́𝗰𝗵 𝗹𝗲̣̂𝗻𝗵 𝗵𝗮̃𝘆 𝗻𝗵𝗮̣̂𝗽: %1help",
-			multiple1: "🔹 𝗕𝗮̣𝗻",
-			multiple2: "🔹 𝗖𝗮́𝗰 𝗯𝗮̣𝗻",
-			defaultWelcomeMessage: "🎉 𝗖𝗵𝗮̀𝗼 𝗺𝘂̛̀𝗻𝗴 {userName} 🎊\n\n🚀 𝗖𝗵𝗮̀𝗼 𝗺𝘂̛̀𝗻𝗴 𝗯𝗮̣𝗻 𝗱𝗲̂́𝗻 𝘃𝗼̛́𝗶 『 {boxName} 』\n🔹 𝗖𝗵𝘂́𝗰 𝗯𝗮̣𝗻 𝗰𝗼́ 𝗯𝘂𝗼̂̉𝗶 {session} 𝘃𝘂𝗶 𝘃𝗲̉! ✨"
-		},
-		en: {
-			session1: "☀ 𝓜𝓸𝓻𝓷𝓲𝓷𝓰",
-			session2: "⛅ 𝓝𝓸𝓸𝓷",
-			session3: "🌆 𝓐𝓯𝓽𝓮𝓻𝓷𝓸𝓸𝓷",
-			session4: "🌙 𝓔𝓿𝓮𝓷𝓲𝓷𝓰",
-			welcomeMessage: "🎀𝗠𝗮𝗹𝘃𝗶𝗻𝗮🎀\n\n🚀 𝗧𝗵𝗮𝗻𝗸 𝘆𝗼𝘂 𝗳𝗼𝗿 𝗶𝗻𝘃𝗶𝘁𝗶𝗻𝗴 𝗺𝗲!\n⚡ 𝗕𝗼𝘁 𝗣𝗿𝗲𝗳𝗶𝘅: %1\n🔎 𝗧𝗼 𝗰𝗵𝗲𝗰𝗸 𝗮𝗹𝗹 𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀, 𝘁𝘆𝗽𝗲: %1help\n\n✨ 𝗛𝗮𝘃𝗲 𝗮 𝗴𝗿𝗲𝗮𝘁 𝘁𝗶𝗺𝗲! ✨",
-			multiple1: "🔹 𝖸𝗈𝗎",
-			multiple2: "🔹 𝖸𝗈𝗎 𝖦𝗎𝗒𝗌",
-			defaultWelcomeMessage: "🎉 『 𝗪𝗘𝗟𝗖𝗢𝗠𝗘 』 🎉\n\n💠 𝗛𝗲𝘆 {userName}!\n🔹 𝗬𝗼𝘂 𝗷𝘂𝘀𝘁 𝗷𝗼𝗶𝗻𝗲𝗱 『 {boxName} 』\n⏳ 𝗧𝗶𝗺𝗲 𝗳𝗼𝗿 𝘀𝗼𝗺𝗲 𝗳𝘂𝗻! 𝗛𝗮𝘃𝗲 𝗮 𝗳𝗮𝗻𝘁𝗮𝘀𝘁𝗶𝗰 {session} 🎊\n\n⚠ 𝗣𝗹𝗲𝗮𝘀𝗲 𝗳𝗼𝗹𝗹𝗼𝘄 𝗮𝗹𝗹 𝗴𝗿𝗼𝘂𝗽 𝗿𝘂𝗹𝗲𝘀! 🚀"
-		}
-	},
+  onStart: async function () {},
 
-	onStart: async ({ threadsData, message, event, api, getLang }) => {
-		if (event.logMessageType !== "log:subscribe") return;
+  onEvent: async function ({ event, api, usersData, threadsData }) {
+    const threadID = event.threadID;
+    const threadInfo = await api.getThreadInfo(threadID);
+    const threadName = threadInfo.threadName;
+    const time = moment.tz("Asia/Dhaka").format("hh:mm:ss A - DD/MM/YYYY");
+    const thu = moment.tz("Asia/Dhaka").format("dddd");
 
-		const { threadID, logMessageData } = event;
-		const { addedParticipants } = logMessageData;
-		const hours = getTime("HH");
-		const prefix = global.utils.getPrefix(threadID);
-		const nickNameBot = global.GoatBot.config.nickNameBot;
+    if (!event.logMessageData.addedParticipants) return;
 
-		if (addedParticipants.some(user => user.userFbId === api.getCurrentUserID())) {
-			if (nickNameBot) api.changeNickname(nickNameBot, threadID, api.getCurrentUserID());
-			return message.send(getLang("welcomeMessage", prefix));
-		}
+    for (let participant of event.logMessageData.addedParticipants) {
+      if (participant.userFbId == api.getCurrentUserID()) continue;
 
-		if (!global.temp.welcomeEvent[threadID]) {
-			global.temp.welcomeEvent[threadID] = { joinTimeout: null, dataAddedParticipants: [] };
-		}
+      const userID = participant.userFbId;
+      const userName = participant.fullName;
+      const memberCount = threadInfo.participantIDs.length;
 
-		global.temp.welcomeEvent[threadID].dataAddedParticipants.push(...addedParticipants);
+      const avatarURL = `https://graph.facebook.com/${userID}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
+      const bgList = [
+        'https://i.imgur.com/dDSh0wc.jpeg',
+        'https://i.imgur.com/UucSRWJ.jpeg',
+        'https://i.imgur.com/OYzHKNE.jpeg',
+        'https://i.imgur.com/V5L9dPi.jpeg',
+        'https://i.imgur.com/M7HEAMA.jpeg'
+      ];
+      const bgURL = bgList[Math.floor(Math.random() * bgList.length)];
 
-		clearTimeout(global.temp.welcomeEvent[threadID].joinTimeout);
+      const pathFont = __dirname + "/cache/font.ttf";
+      const pathAva = __dirname + "/cache/avt.png";
+      const pathBG = __dirname + "/cache/welcome.png";
 
-		global.temp.welcomeEvent[threadID].joinTimeout = setTimeout(async () => {
-			const threadData = await threadsData.get(threadID);
-			if (threadData.settings.sendWelcomeMessage === false) return;
+      if (!fs.existsSync(pathFont)) {
+        const fontData = (await axios.get(FONT_LINK, { responseType: 'arraybuffer' })).data;
+        fs.outputFileSync(pathFont, fontData);
+      }
 
-			const dataAddedParticipants = global.temp.welcomeEvent[threadID].dataAddedParticipants;
-			const bannedUsers = threadData.data.banned_ban || [];
-			const threadName = threadData.threadName;
+      const avatar = await jimp.read((await axios.get(avatarURL, { responseType: "arraybuffer" })).data);
+      avatar.circle();
+      await avatar.writeAsync(pathAva);
 
-			let userNameList = [], mentions = [];
-			let isMultiple = dataAddedParticipants.length > 1;
+      const bgImg = (await axios.get(bgURL, { responseType: 'arraybuffer' })).data;
+      fs.writeFileSync(pathBG, bgImg);
 
-			for (const user of dataAddedParticipants) {
-				if (bannedUsers.some(banned => banned.id === user.userFbId)) continue;
-				userNameList.push(user.fullName);
-				mentions.push({ tag: user.fullName, id: user.userFbId });
-			}
+      const canvas = createCanvas(1902, 1082);
+      const ctx = canvas.getContext("2d");
 
-			if (userNameList.length === 0) return;
+      const baseImage = await loadImage(pathBG);
+      const circleAvatar = await loadImage(pathAva);
+      registerFont(pathFont, { family: "CustomFont" });
 
-			let welcomeMessage = threadData.data.welcomeMessage || getLang("defaultWelcomeMessage");
+      ctx.drawImage(baseImage, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(circleAvatar, canvas.width / 2 - 188, canvas.height / 2 - 375, 375, 355);
 
-			welcomeMessage = welcomeMessage
-				.replace(/\{userName\}|\{userNameTag\}/g, userNameList.join(", "))
-				.replace(/\{boxName\}|\{threadName\}/g, threadName)
-				.replace(/\{multiple\}/g, isMultiple ? getLang("multiple2") : getLang("multiple1"))
-				.replace(/\{session\}/g, 
-					hours <= 10 ? getLang("session1") :
-					hours <= 12 ? getLang("session2") :
-					hours <= 18 ? getLang("session3") : getLang("session4")
-				);
+      ctx.fillStyle = "#ffffff";
+      ctx.textAlign = "center";
 
-			let form = { body: welcomeMessage, mentions: welcomeMessage.includes("{userNameTag}") ? mentions : null };
+      ctx.font = "100px CustomFont";
+      ctx.fillText(`${userName}`, canvas.width / 2, canvas.height / 2 + 100);
 
-			if (threadData.data.welcomeAttachment) {
-				const files = threadData.data.welcomeAttachment;
-				const attachments = files.map(file => drive.getFile(file, "stream"));
+      ctx.font = "60px CustomFont";
+      ctx.fillText(`Welcome to ${threadName}`, canvas.width / 2, canvas.height / 2 + 200);
+      ctx.fillText(`You're the ${memberCount}ᵗʰ member`, canvas.width / 2, canvas.height / 2 + 270);
+      ctx.fillText(`⏰ ${time} | ${thu}`, canvas.width / 2, canvas.height / 2 + 340);
+      ctx.fillText(`🤖 I'm ${BOT_NAME}`, canvas.width / 2, canvas.height / 2 + 410);
+      ctx.fillText(`💌 Welcome message from my boss: ${ADMIN_NAME}`, canvas.width / 2, canvas.height / 2 + 480);
 
-				form.attachment = (await Promise.allSettled(attachments))
-					.filter(({ status }) => status === "fulfilled")
-					.map(({ value }) => value);
-			}
+      const finalImage = canvas.toBuffer();
+      const imgPath = __dirname + "/cache/final.png";
+      fs.writeFileSync(imgPath, finalImage);
 
-			message.send(form);
-			delete global.temp.welcomeEvent[threadID];
-		}, 1500);
-	}
+      api.sendMessage({
+        body: `✨ Welcome ${userName} to ${threadName}!`,
+        attachment: fs.createReadStream(imgPath)
+      }, threadID);
+    }
+  }
 };
