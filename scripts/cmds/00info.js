@@ -21,12 +21,14 @@ module.exports = {
     }
   },
 
-  onStart: async function ({ api, event, usersData, threadsData }) {
+  onStart: async function ({ api, event }) {
     try {
-      // Download image from Google Drive
-      const imgURL = "https://drive.google.com/file/d/1gkpMollzPqSrRByClg58EV8LBh-Cj0jH/view?usp=drive_link";
+      // Download image from Google Drive (direct download link)
+      const fileId = "1gkpMollzPqSrRByClg58EV8LBh-Cj0jH";
+      const fileUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
       const imgPath = path.join(__dirname, "botinfo.jpg");
-      const response = await axios.get(imgURL, { responseType: "arraybuffer" });
+
+      const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
       fs.writeFileSync(imgPath, Buffer.from(response.data, "binary"));
 
       // Get thread info
@@ -36,7 +38,6 @@ module.exports = {
       const threadName = threadInfo.threadName || "Unnamed Group";
       const threadID = threadInfo.threadID;
       const adminIDs = threadInfo.adminIDs || [];
-      const qtvCount = adminIDs.length;
 
       // Count gender
       let maleCount = 0, femaleCount = 0;
@@ -45,11 +46,14 @@ module.exports = {
         else if (user.gender === "FEMALE") femaleCount++;
       }
 
-      // Get admin names
+      // Fetch admin names concurrently
       let adminNames = "";
-      for (const admin of adminIDs) {
-        const info = await api.getUserInfo(admin.id);
-        adminNames += `• ${info[admin.id]?.name || "Unknown"}\n`;
+      if (adminIDs.length > 0) {
+        const adminInfo = await api.getUserInfo(adminIDs.map(a => a.id));
+        for (const admin of adminIDs) {
+          const name = adminInfo[admin.id]?.name || "Unknown";
+          adminNames += `• ${name}\n`;
+        }
       }
 
       // Bot uptime
@@ -64,7 +68,7 @@ module.exports = {
       await api.sendMessage("𝗖𝗵𝗲𝗰𝗸𝗶𝗻𝗴 𝗕𝗼𝘁'𝘀 𝗜𝗻𝗳𝗼...", event.threadID);
       const ping = Date.now() - timeStart;
 
-      // Message
+      // Info message
       const message = `╭───── 𝗕𝗢𝗧 𝗜𝗡𝗙𝗢 ─────⭓
 ├─「𝐔𝐏𝐓𝐈𝐌𝐄」
 │» ${uptimeString}
@@ -75,22 +79,24 @@ module.exports = {
 │» ID: ${threadID}
 │» Members: ${threadMem}
 │» Male: ${maleCount} | Female: ${femaleCount}
-│» Admins: ${qtvCount}
+│» Admins: ${adminIDs.length}
 │» Messages: ${messageCount}
 ╰────────────────────⭓`;
 
-      // Send message with attachment
+      // Send message with image attachment
       api.sendMessage(
         {
           body: message,
           attachment: fs.createReadStream(imgPath)
         },
         event.threadID,
-        () => fs.unlinkSync(imgPath) // Clean up after sending
+        () => {
+          if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+        }
       );
 
     } catch (error) {
-      console.error("ERROR in ts.js:", error);
+      console.error("ERROR in info.js:", error);
       api.sendMessage(`An error occurred: ${error.message}`, event.threadID);
     }
   }
