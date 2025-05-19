@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['stats', 'status', 'system', 'rtm'],
     version: '1.5',
      usePrefix: true,
-    author: 'Badhon',
+    author: 'BADHON',
     countDown: 15,
     role: 0,
     shortDescription: 'Display bot uptime and system stats with media ban check',
@@ -23,7 +23,7 @@ module.exports = {
   },
   onStart: async function ({ message, event, usersData, threadsData, api }) {
     // Anti-Author Change Check
-    if (this.config.author !== 'Mahi--') {
+    if (this.config.author !== 'BADHON') {
       return message.reply("⚠ Unauthorized author change detected. Command execution stopped.");
     }
 
