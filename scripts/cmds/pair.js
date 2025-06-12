@@ -5,7 +5,7 @@ const fs = require("fs-extra");
 module.exports = {
   config: {
     name: "pair",
-    aurthor:"xemon",
+    aurthor:"Badhon",
      role: 0,
     shortDescription: " ",
     longDescription: "",
@@ -18,7 +18,7 @@ module.exports = {
     let pathAvt2 = __dirname + "/tmp/Avthai.png";
 
     var id1 = event.senderID;
-    var name1 = await usersData.getName(id1); // Replace with function that retrieves the name of the user
+    var name1 = ""; // Replace with function that retrieves the name of the user
     var ThreadInfo = await api.getThreadInfo(event.threadID);
     var all = ThreadInfo.userInfo;
     for (let c of all) {
@@ -44,7 +44,7 @@ module.exports = {
       }
     }
     var id2 = ungvien[Math.floor(Math.random() * ungvien.length)];
-    var name2 = await usersData.getName(id2); // Replace with function that retrieves the name of the user
+    var name2 = "Uff ksto ramro jodi 💋"; // Replace with function that retrieves the name of the user
     var rd1 = Math.floor(Math.random() * 100) + 1;
     var cc = ["0", "-1", "99,99", "-99", "-100", "101", "0,01"];
     var rd2 = cc[Math.floor(Math.random() * cc.length)];
@@ -53,9 +53,11 @@ module.exports = {
     var tile = djtme[Math.floor(Math.random() * djtme.length)];
 
     var background = [
+      "https://i.postimg.cc/wjJ29HRB/background1.png",
+      "https://i.postimg.cc/zf4Pnshv/background2.png",
       "https://i.postimg.cc/5tXRQ46D/background3.png",
     ];
-    var rd = background;
+    var rd = background[Math.floor(Math.random() * background.length)];
     let getAvtmot = (
       await axios.get(`https://graph.facebook.com/${id1}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`, {
         responseType: "arraybuffer",
@@ -90,7 +92,7 @@ module.exports = {
     fs.removeSync(pathAvt2);
     return api.sendMessage(
       {
-        body: `『💗』Congratulations ${name1}『💗』\n『❤️』Looks like your destiny brought you together with ${name2}『❤️』\n『🔗』Your link percentage is ${tile}%『🔗』`,
+        body: `🥰Successful pairing! ${name1}\💌Wish you two hundred years of happiness💕${name2}.\—The odds are ${tile}%`,
         mentions: [
           {
             tag: `${name2}`,
