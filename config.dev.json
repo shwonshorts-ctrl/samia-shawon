@@ -29,7 +29,7 @@
     ""
   ],
   "whiteListMode": {
-    "enable": false,
+    "enable": true,
     "whiteListIds": [
       "",
       "",
