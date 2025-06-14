@@ -5,7 +5,7 @@ const axios = require("axios");
 module.exports = {
   config: {
     name: "hack",
-    author: "jun",
+    author: "Mostakim",
     countDown: 5,
     role: 2,
     category: "fun",
@@ -44,13 +44,13 @@ module.exports = {
   },
 
   onStart: async function ({ args, usersData, threadsData, api, event }) {
-    let pathImg = __dirname + "/tmp/background.png";
-    let pathAvt1 = __dirname + "/tmp/Avtmot.png";
+    let pathImg = __dirname + "/cache/background.png";
+    let pathAvt1 = __dirname + "/cache/Avtmot.png";
     var id = Object.keys(event.mentions)[0] || event.senderID;
     var name = await api.getUserInfo(id);
     name = name[id].name;
     var ThreadInfo = await api.getThreadInfo(event.threadID);
-    var background = ["https://i.imgur.com/VQXViKI.png"];
+    var background = ["https://drive.google.com/uc?id=1RwJnJTzUmwOmP3N_mZzxtp63wbvt9bLZ"];
     var rd = background[Math.floor(Math.random() * background.length)];
     let getAvtmot = (
       await axios.get(
