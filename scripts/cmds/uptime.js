@@ -1,4 +1,4 @@
-const os = require("os");
+^cmd install uptime.js const os = require("os");
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function formatTime(seconds) {
@@ -13,21 +13,21 @@ function createProgressBar(percentage) {
   const totalBars = 20;
   const filledBars = Math.round((totalBars * percentage) / 100);
   const emptyBars = totalBars - filledBars;
-  return "▓".repeat(filledBars) + "░".repeat(emptyBars);
+  return "█".repeat(filledBars) + "░".repeat(emptyBars);
 }
 
 module.exports = {
   config: {
     name: "uptime",
     aliases: ["up", "upt", "u"],
-    version: "3.1",
+    version: "4.0-premium",
     author: "𝗕𝗔𝗗𝗛𝗢𝗡 𝗥𝗢𝗛𝗠𝗔𝗡 💀✨",
     role: 0,
     shortDescription: {
-      en: "Detailed Uptime, System Status"
+      en: "Premium Uptime & System Stats"
     },
     longDescription: {
-      en: "Displays Uptime, System Status, and other System-related Information."
+      en: "Displays system uptime, performance, memory usage, and other system stats in a premium UI format."
     },
     category: "tools",
     guide: {
@@ -54,41 +54,41 @@ module.exports = {
       const userName = os.userInfo().username;
 
       const quotes = [
-        "“Coding is not just code, it's a life style!”",
-        "“Wake up, Code, Repeat!”",
-        "“Dream in code, live in reality.”",
-        "“Bots run the world silently.”"
+        "⚙️ “Coding is not just code, it's a lifestyle.”",
+        "🚀 “Wake up, Code, Repeat.”",
+        "🌙 “Dream in code, live in reality.”",
+        "🤖 “Bots run the world silently.”"
       ];
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
       const uptimeMessage = `
-╭───〔 🖥️ UPTIME REPORT 〕───╮
-│
-│ ⏱️ Total Uptime: ${formattedUptime}
-│
-│ 📊 Progress:
-│ [ ${uptimeProgressBar} ] (${uptimePercent}%)
-│
-│ ⚡ Ping: ${ping}ms
-│ 🤖 Bot Name: Melisa
-│ 🛠️ Version: v1.0
-│
-├───〔 🔧 System Status 〕───
-│ 👥 User: ${userName}
-│ 💻 CPU Load: ${cpuLoad}
-│ 🧠 Memory: ${usedMemPercent}%
-│
-├───〔 ✨ Quote of the Moment 〕───
-│ ${randomQuote}
-│
-╰──〔 ❤️ Powered by BADHON 💀✨ 〕─╯
+╭─────〔 👑 𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗨𝗣𝗧𝗜𝗠𝗘 𝗥𝗘𝗣𝗢𝗥𝗧 〕─────╮
+
+🟢 𝗨𝗣𝗧𝗜𝗠𝗘
+⏱️ ${formattedUptime}
+📈 [ ${uptimeProgressBar} ] ${uptimePercent}%
+
+📡 𝗣𝗘𝗥𝗙𝗢𝗥𝗠𝗔𝗡𝗖𝗘
+⚡ Ping: ${ping}ms
+🤖 Bot: Melisa
+🔖 Version: v1.0
+
+🖥️ 𝗦𝗬𝗦𝗧𝗘𝗠 𝗦𝗧𝗔𝗧𝗨𝗦
+👤 User: ${userName}
+💾 Memory Usage: ${usedMemPercent}%
+💻 CPU Load: ${cpuLoad}
+
+💬 𝗠𝗢𝗧𝗜𝗩𝗔𝗧𝗜𝗢𝗡
+${randomQuote}
+
+╰────〔 🔋 𝗣𝗢𝗪𝗘𝗥𝗘𝗗 𝗕𝗬 𝗕𝗔𝗗𝗛𝗢𝗡 🔋 〕─────╯
 `;
 
-      await delay(500);
+      await delay(300);
       await api.sendMessage(uptimeMessage, event.threadID);
     } catch (err) {
       console.error("Uptime command error:", err);
-      return api.sendMessage("❌ An error occurred while fetching system uptime.", event.threadID);
+      return api.sendMessage("❌ An error occurred while fetching uptime data.", event.threadID);
     }
   }
 };
