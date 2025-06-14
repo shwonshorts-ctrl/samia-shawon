@@ -1,4 +1,4 @@
-^cmd install uptime.js const os = require("os");
+const os = require("os");
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function formatTime(seconds) {
