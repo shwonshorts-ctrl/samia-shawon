@@ -5,7 +5,7 @@ module.exports = {
   config: Object.freeze({
     name: "help",
     version: "1.20",
-    author: "𝗕𝗔𝗗𝗛𝗢𝗡 𝗥𝗢𝗛𝗠𝗔𝗡 💀✨",
+    author: "✦ BADHON ROHMAN ✦",
     countDown: 5,
     role: 0,
     shortDescription: { en: "📖 View command usage" },
@@ -62,16 +62,29 @@ module.exports = {
       const usage = guideBody.replace(/{pn}/g, prefix).replace(/{n}/g, configCommand.name);
       const aliasList = aliases.get(configCommand.name) || [];
 
-      const response = `─━ 📌 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐈𝐍𝐅𝐎 ━─\n` +
-                       `🔹 Name: ${configCommand.name}\n` +
-                       `📜 Description: ${longDescription}\n` +
-                       `🆔 Aliases: ${aliasList.length ? aliasList.join(", ") : "None"}\n` +
-                       `📎 Version: ${configCommand.version || "1.0"}\n` +
-                       `👤 Role: ${roleText}\n` +
-                       `⏳ Cooldown: ${configCommand.countDown || "1"}s\n` +
-                       `👨‍💻 Author: ${author}\n` +
-                       `📖 Usage: ${usage}\n` +
-                       `━━━━━━━━━━━━━━━━━━━━`;
+      const response = `╭────「 𝐂𝐎𝐌𝐌𝐀𝐍𝐃 𝐇𝐄𝐋𝐏 」────⦿
+│ 
+│`✦ Name: ${configCommand.name}\n` +
+│`✦ Author: ${author}\n` +
+│
+│`✦ Aliases: ${aliasList.length ? aliasList.join(", ") : "None"}\n` +
+│
+│`✦ Version: ${configCommand.version || "1.0"}\n` +
+│`✦ Role: ${roleText}\n` +
+│ 
+│ 
+│`✦ Cooldown: ${configCommand.countDown || "1"}s\n` +
+│   
+│   
+│  
+│ 
+│ `✦ Description: ${longDescription}\n` +
+│ 
+│`✦ Usage: ${usage}\n` +
+│ 
+│  
+│ 
+╰─────「 𝗠𝗘𝗟𝗜𝗦𝗔 𝗕𝗕'𝗘 」──────⦿`;
 
       await message.reply(response);
     }
