@@ -1,102 +1,114 @@
-// event/welcome.js
-/**
- * ╔════════════════════════════╗
- * ║   MELISSA BB'E WELCOME SYSTEM   ║
- * ╚════════════════════════════╝
- * ✦ Bot Author: BADHON ✦
- * ✦ Version: 2.1 
- */
-
 const { getTime, drive } = global.utils;
-if (!global.temp.welcomeEvent) global.temp.welcomeEvent = {};
+if (!global.temp.welcomeEvent)
+	global.temp.welcomeEvent = {};
 
 module.exports = {
-    config: {
-        name: "welcome",
-        version: "2.1",
-        author: " ✦ BADHON ✦",
-        category: "events"
-    },
+	config: {
+		name: "welcome",
+		version: "1.7",
+		author: " ✦ BADHON ✦ ",
+		category: "events"
+	},
 
-    onStart: async ({ threadsData, message, event, api, getLang }) => {
-        if (event.logMessageType == "log:subscribe") {
-            try {
-                const { threadID } = event;
-                const { nickNameBot } = global.GoatBot.config;
-                const prefix = global.utils.getPrefix(threadID);
-                const dataAddedParticipants = event.logMessageData.addedParticipants;
+	langs: {
+		vi: {
+			session1: "sáng",
+			session2: "trưa",
+			session3: "chiều",
+			session4: "tối"
+		},
+		en: {
+			session1: "morning",
+			session2: "noon",
+			session3: "afternoon",
+			session4: "evening"
+		}
+	},
 
-                // Bot join handler
-                if (dataAddedParticipants.some(item => item.userFbId == api.getCurrentUserID())) {
-                    if (nickNameBot) {
-                        await api.changeNickname(nickNameBot, threadID, api.getCurrentUserID());
-                    }
-                    return message.send(`╭────「 SYSTEM MESSAGE 」────⦿
-┃ ✦ Thank you for adding me!
-┃ ✦ Bot Prefix: ${prefix}
-┃ ✦ Type ${prefix}help for commands
-╰─────「 𝗠𝗘𝗟𝗜𝗦𝗔 𝗕𝗕'𝗘 」──────⦿`);
-                }
+	onStart: async ({ threadsData, message, event, api, getLang }) => {
+		if (event.logMessageType == "log:subscribe")
+			return async function () {
+				const hours = getTime("HH");
+				const { threadID } = event;
+				const { nickNameBot } = global.GoatBot.config;
+				const prefix = global.utils.getPrefix(threadID);
+				const dataAddedParticipants = event.logMessageData.addedParticipants;
+				
+				// if new member is bot
+				if (dataAddedParticipants.some((item) => item.userFbId == api.getCurrentUserID())) {
+					if (nickNameBot)
+						api.changeNickname(nickNameBot, threadID, api.getCurrentUserID());
+					return;
+				}
+				
+				// if new member:
+				if (!global.temp.welcomeEvent[threadID])
+					global.temp.welcomeEvent[threadID] = {
+						joinTimeout: null,
+						dataAddedParticipants: []
+					};
 
-                // Initialize thread welcome data
-                if (!global.temp.welcomeEvent[threadID]) {
-                    global.temp.welcomeEvent[threadID] = {
-                        joinTimeout: null,
-                        dataAddedParticipants: []
-                    };
-                }
+				// push new member to array
+				global.temp.welcomeEvent[threadID].dataAddedParticipants.push(...dataAddedParticipants);
+				// if timeout is set, clear it
+				clearTimeout(global.temp.welcomeEvent[threadID].joinTimeout);
 
-                // Add new participants
-                global.temp.welcomeEvent[threadID].dataAddedParticipants.push(...dataAddedParticipants);
-                clearTimeout(global.temp.welcomeEvent[threadID].joinTimeout);
+				// set new timeout
+				global.temp.welcomeEvent[threadID].joinTimeout = setTimeout(async function () {
+					const threadData = await threadsData.get(threadID);
+					if (threadData.settings.sendWelcomeMessage == false)
+						return;
+					const dataAddedParticipants = global.temp.welcomeEvent[threadID].dataAddedParticipants;
+					const dataBanned = threadData.data.banned_ban || [];
+					const threadName = threadData.threadName;
+					const userName = [],
+						mentions = [];
+					let multiple = false;
 
-                // Process welcome after delay
-                global.temp.welcomeEvent[threadID].joinTimeout = setTimeout(async () => {
-                    const threadData = await threadsData.get(threadID);
-                    if (threadData.settings.sendWelcomeMessage == false) return;
+					if (dataAddedParticipants.length > 1)
+						multiple = true;
 
-                    const participants = global.temp.welcomeEvent[threadID].dataAddedParticipants;
-                    const bannedUsers = threadData.data.banned_ban || [];
-                    const threadName = threadData.threadName;
-                    const userName = [], mentions = [];
-                    let multiple = participants.length > 1;
-
-                    // Get admin info
-                    const adminList = await api.getThreadAdministrators(threadID);
-                    const adminId = adminList[0];
-                    const adminInfo = adminId ? (await api.getUserInfo(adminId))[adminId] : null;
-                    const adminName = adminInfo?.name || "Group Admin";
-
-                    // Time-based greeting
-                    const joinTime = new Date();
-                    const time = (() => {
-                        const hours = joinTime.getHours();
-                        if (hours < 5) return { text: "Good Night", emoji: "🌙" };
-                        if (hours < 12) return { text: "Good Morning", emoji: "🌅" };
-                        if (hours < 17) return { text: "Good Afternoon", emoji: "☀️" };
-                        if (hours < 21) return { text: "Good Evening", emoji: "🌆" };
-                        return { text: "Good Night", emoji: "🌃" };
-                    })();
-
-                    // Filter valid users
-                    for (const user of participants) {
-                        if (bannedUsers.some(item => item.id == user.userFbId)) continue;
-                        userName.push(user.fullName);
-                        mentions.push({ tag: user.fullName, id: user.userFbId });
-                    }
-
-                    if (userName.length == 0) return;
-
-                    // Custom welcome message
-                    const welcomeMessage = `╭────「 WELCOME DEAR USER 」────⦿
-┃ ✦ ${time.emoji} ${time.text}, ${userName.join(", ")}!
+					for (const user of dataAddedParticipants) {
+						if (dataBanned.some((item) => item.id == user.userFbId))
+							continue;
+						userName.push(user.fullName);
+						mentions.push({
+							tag: user.fullName,
+							id: user.userFbId
+						});
+					}
+					
+					if (userName.length == 0) return;
+					
+					// Get admin names
+					const adminIDs = threadData.adminIDs || [];
+					const adminNames = [];
+					for (const adminID of adminIDs) {
+						try {
+							const userInfo = await api.getUserInfo(adminID);
+							adminNames.push(userInfo[adminID].name);
+						} catch (e) {
+							console.error("Error getting admin info:", e);
+						}
+					}
+					
+					const joinTime = new Date();
+					const timeText = hours <= 10 ? getLang("session1") :
+									hours <= 12 ? getLang("session2") :
+									hours <= 18 ? getLang("session3") : getLang("session4");
+					const timeEmoji = hours <= 10 ? "🌅" :
+									hours <= 12 ? "☀️" :
+									hours <= 18 ? "🌇" : "🌃";
+					
+					const welcomeMessage = `╭────「 WELCOME DEAR USER 」────⦿
+┃ ✦ ${timeEmoji} ${timeText}, ${userName.join(", ")}!
 ┃ ✦
 ┃ ✦ 🏠 Group: ${threadName}
-┃ ✦ 👑 Admin: ${adminName}
+┃ ✦ 👑 Admin: ${adminNames.join(", ") || "None"}
 ┃ ✦ 👥 Members: ${threadData.participants.length}
 ┃ ✦ 🤖 Bot: Melissa BB'E
 ┃ ✦
-┃ ✦ 📌 User UID: ${participants[0].userFbId}
+┃ ✦ 📌 User UID: ${dataAddedParticipants[0].userFbId}
 ┃ ✦ 📌 Group TID: ${threadID}
 ┃ ✦
 ┃ ✦ 📅 ${joinTime.toDateString()}
@@ -106,52 +118,24 @@ module.exports = {
 ┃ ✦ Bot Author: BADHON ✦
 ╰─────「 𝗠𝗘𝗟𝗜𝗦𝗔 𝗕𝗕'𝗘 」──────⦿`;
 
-                    const form = {
-                        body: welcomeMessage,
-                        mentions: mentions
-                    };
+					const form = {
+						body: welcomeMessage,
+						mentions: mentions.length ? mentions : null
+					};
 
-                    // Handle attachments
-                    if (threadData.data.welcomeAttachment) {
-                        const files = threadData.data.welcomeAttachment;
-                        const attachments = files.map(file => drive.getFile(file, "stream"));
-                        const results = await Promise.allSettled(attachments);
-                        form.attachment = results.filter(res => res.status === "fulfilled").map(res => res.value);
-                    }
-
-                    await message.send(form);
-                    
-                    // Send follow-up command help
-                    setTimeout(async () => {
-                        await message.send({
-                            body: `╭────「 COMMAND LIST 」────⦿
-┃ ✦ ${prefix}help - Show all commands
-┃ ✦ ${prefix}info - Group information
-┃ ✦ ${prefix}fun - Entertainment
-┃ ✦ ${prefix}mod - Moderator tools
-┃ ✦
-┃ ✦ Need help? Contact admin!
-╰─────「 𝗠𝗘𝗟𝗜𝗦𝗔 𝗕𝗕'𝗘 」──────⦿`,
-                            threadID
-                        });
-                    }, 3000);
-
-                    delete global.temp.welcomeEvent[threadID];
-                }, 1500);
-            } catch (error) {
-                console.error("[WELCOME SYSTEM ERROR]:", error);
-                // Fallback welcome
-                if (event.threadID) {
-                    await message.send({
-                        body: `╭────「 SYSTEM ERROR 」────⦿
-┃ ✦ Welcome to the group!
-┃ ✦ Sorry for the basic welcome
-┃ ✦ System will recover shortly
-╰─────「 𝗠𝗘𝗟𝗜𝗦𝗔 𝗕𝗕'𝗘 」──────⦿`,
-                        threadID: event.threadID
-                    });
-                }
-            }
-        }
-    }
+					if (threadData.data.welcomeAttachment) {
+						const files = threadData.data.welcomeAttachment;
+						const attachments = files.reduce((acc, file) => {
+							acc.push(drive.getFile(file, "stream"));
+							return acc;
+						}, []);
+						form.attachment = (await Promise.allSettled(attachments))
+							.filter(({ status }) => status == "fulfilled")
+							.map(({ value }) => value);
+					}
+					message.send(form);
+					delete global.temp.welcomeEvent[threadID];
+				}, 1500);
+			};
+	}
 };
