@@ -3,7 +3,7 @@ module.exports = {
         name: "kickall",
         aliases: ["leaveall", "botoutall", "outall"],
         version: "2.0",
-        author: "BADHON",
+        author: "✦ BADHON ✦",
         countDown: 5,
         role: 2, // Only bot admin can use this command
         shortDescription: "Make bot leave all groups",
