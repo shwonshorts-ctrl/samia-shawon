@@ -6,10 +6,10 @@ class PrayerTimes {
     constructor() {
         this.config = {
             name: "prayer"
-            timezone: "Asia/Dhaka",
-            author: "Badhon",
-            version: "3.0.0",
-            dataFile: path.join(__dirname, 'prayer_times.json')
+             timezone: "Asia/Dhaka",
+             author: "Badhon",
+             version: "3.0.0",
+             dataFile: path.join(__dirname, 'prayer_times.json')
         };
 
         this.initializeData();
