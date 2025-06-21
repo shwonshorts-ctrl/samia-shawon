@@ -1,11 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const nodeSchedule = require('node-schedule');
-
-class PrayerTimes {
-    constructor() {
         this.config = {
-            name: "prayer"
+              name: "prayer",
              timezone: "Asia/Dhaka",
              author: "Badhon",
              version: "3.0.0",
