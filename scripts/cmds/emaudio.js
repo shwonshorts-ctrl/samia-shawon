@@ -8,7 +8,7 @@ module.exports = {
     longDescription: "Emoji reaction system with different audio responses",
     category: "Special",
     guide: {
-      en: "Just type 😆, 😂, 😒 etc."
+      en: "Just type 😆, 😂,😭, 😒 etc."
     },
     usePrefix: false
   },
@@ -29,6 +29,8 @@ module.exports = {
       "😹": "https://files.catbox.moe/q4vxo1.mp3",
       "😁": "https://files.catbox.moe/q4vxo1.mp3",
       "😒": "https://files.catbox.moe/07bw5k.mp3",
+      "😭": "https://files.catbox.moe/gsfpnj.mp3",
+      "🥹": "https://files.catbox.moe/gsfpnj.mp3",
       [prefix + "owner"]: "https://files.catbox.moe/q4vxo1.mp3"
     };
 
@@ -48,7 +50,7 @@ module.exports = {
   },
 
   sendDefaultResponse: async function ({ message }) {
-    await message.reply("Type 😆, 😂, or 😒 to hear different sounds!");
+    await message.reply("Type 😆, 😂,😭 or 😒 to hear different sounds!");
   },
 
   sendAudioResponse: async function ({ event, message, usersData, audioURL }) {
