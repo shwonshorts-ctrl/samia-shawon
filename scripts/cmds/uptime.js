@@ -19,7 +19,7 @@ function createProgressBar(percentage) {
 module.exports = {
   config: {
     name: "uptime",
-    aliases: ["up", "upt", "u"],
+    aliases: ["up", "upt", "ut"],
     version: "4.0-premium",
     author: "𝗕𝗔𝗗𝗛𝗢𝗡 𝗥𝗢𝗛𝗠𝗔𝗡 💀✨",
     role: 0,
@@ -62,14 +62,14 @@ module.exports = {
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
       const uptimeMessage = `
-╭─────〔 👑 𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗨𝗣𝗧𝗜𝗠𝗘 𝗥𝗘𝗣𝗢𝗥𝗧 〕─────╮
+╭─〔 👑 𝗣𝗥𝗘𝗠𝗜𝗨𝗠 𝗨𝗣𝗧𝗜𝗠𝗘 𝗥𝗘𝗣𝗢𝗥𝗧 〕─╮
 
 🟢 𝗨𝗣𝗧𝗜𝗠𝗘
 ⏱️ ${formattedUptime}
 📈 [ ${uptimeProgressBar} ] ${uptimePercent}%
 
 📡 𝗣𝗘𝗥𝗙𝗢𝗥𝗠𝗔𝗡𝗖𝗘
-⚡ Ping: ${ping}ms
+⚡ Ping: ${ping}% ms
 🤖 Bot: Melisa
 🔖 Version: v1.0
 
@@ -81,7 +81,7 @@ module.exports = {
 💬 𝗠𝗢𝗧𝗜𝗩𝗔𝗧𝗜𝗢𝗡
 ${randomQuote}
 
-╰────〔 🔋 𝗣𝗢𝗪𝗘𝗥𝗘𝗗 𝗕𝗬 𝗕𝗔𝗗𝗛𝗢𝗡 🔋 〕─────╯
+╰─〔 🔋 𝗣𝗢𝗪𝗘𝗥𝗘𝗗 𝗕𝗬 𝗕𝗔𝗗𝗛𝗢𝗡 🔋 〕─╯
 `;
 
       await delay(300);
