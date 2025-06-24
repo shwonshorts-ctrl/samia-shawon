@@ -6,7 +6,7 @@ module.exports = {
     name: 'rtm',
     aliases: ['stats', 'status', 'system', 'rtm'],
     version: '1.5',
-    usePrefix: true,
+    usePrefix: false,
     author: 'BADHON',
     countDown: 15,
     role: 0,
@@ -124,7 +124,7 @@ module.exports = {
 
     } catch (err) {
       console.error(err);
-      return message.reply("❌ An error occurred while fetching system statistics.");
+      return message.reply("⚠️ An error occurred while fetching system statistics.");
     }
   }
 };
