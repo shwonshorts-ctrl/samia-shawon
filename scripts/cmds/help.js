@@ -35,11 +35,11 @@ module.exports = {
 
       for (const category of Object.keys(categories)) {
         msg += `🗂️ 𝗖𝗔𝗧𝗘𝗚𝗢𝗥𝗬: ${category.toUpperCase()}\n`;
-        msg += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `━━━━━━━━━━━━━━━━━━\n`;
         categories[category].sort().forEach((cmd) => {
           msg += `🔹 ${cmd}\n`;
         });
-        msg += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+        msg += `━━━━━━━━━━━━━━━━━━━\n\n`;
       }
 
       msg += `💡 Tip: Type '${prefix}help [command]' for detailed info.\n`;
