@@ -1,6 +1,13 @@
 language = "nodejs"
-run = "npm start"
+run = "npm run dev"
+modules = ["nodejs-16", "web", "nix", "bash"]
 
 [[ports]]
 localPort = 9999
 externalPort = 80
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run dev"]
