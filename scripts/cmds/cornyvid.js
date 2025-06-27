@@ -1,4 +1,4 @@
-^cmd install cornyvid.js module.exports = {
+module.exports = {
   config: {
     name: "cornyvid",
     version: "1",
