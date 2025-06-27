@@ -1,4 +1,4 @@
-module.exports = {
+^cmd install cornyvid.js module.exports = {
   config: {
     name: "cornyvid",
     version: "1",
@@ -25,12 +25,21 @@ module.exports = {
         "https://files.catbox.moe/faosm4.mp4",
         "https://files.catbox.moe/5cvgxp.mp4",
         "https://files.catbox.moe/drdj1j.mp4",
+        "https://files.catbox.moe/8z7vay.mp4",
+				"https://files.catbox.moe/dty32d.mp4",
+				"https://files.catbox.moe/q0hrek.mp4",
+				"https://files.catbox.moe/1i3l9u.mp4",
+				"https://files.catbox.moe/03vl6j.mp4",
+				"https://files.catbox.moe/epnqxz.mp4",
+				"https://files.catbox.moe/cactm7.mp4",
         "https://files.catbox.moe/ecs0qv.mp4",
         "https://files.catbox.moe/hdj7jh.mp4",
         "https://files.catbox.moe/5fs4fr.mp4",
         "https://files.catbox.moe/p5b90x.mp4",
         "https://files.catbox.moe/yeagdv.mp4",
-        "https://files.catbox.moe/qelfrh.mp4"
+        "https://files.catbox.moe/qelfrh.mp4",
+
+"https://files.catbox.moe/4gldl9.mp4"
       ];
       
       // Select a random video
