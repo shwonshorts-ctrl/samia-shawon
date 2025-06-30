@@ -11,6 +11,7 @@
 		"@distube/ytdl-core": "^4.13.3",
 		"1secmail-api": "^1.1.1",
 		"axios": "^1.4.0",
+	      	"jimp": "^1.0.47",
 		"bcrypt": "^5.0.1",
 		"canvas": "^2.9.1",
 		"cheerio": "^1.0.0-rc.12",
