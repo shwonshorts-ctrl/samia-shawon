@@ -36,7 +36,7 @@ module.exports = {
     role: 0,
     author: "𝐁𝐀𝐃𝐇𝐎𝐍",
     description: "NSFW Videos",
-    category: "horny",
+    category: "18+",
     guide: "React with emoji to get videos",
     cooldowns: 5,
   },
