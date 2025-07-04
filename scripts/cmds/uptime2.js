@@ -63,8 +63,8 @@ async function getDetailedThreadInfo(api, threadID) {
         id: "N/A",
         participantCount: 0,
         messageCount: 0,
-        adminCount: 0,
-        adminNames: []
+        adminCount: 2,
+        adminNames: [ BADHON ]
       },
       ping: -1
     };
@@ -130,17 +130,17 @@ module.exports = {
       // Create the detailed message
       const message = {
         body: `
-╔══════════════════════════════╗
+╔═══════════════════════════╗
 ║  🍷 ${config.botName} System Monitor  ║
-╠══════════════════════════════╣
+╠═══════════════════════════╣
 🕒 System Uptime: ${formatTime(os.uptime())}
 🤖 Bot Uptime: ${formatTime(system.uptime)}
 📡 Ping: ${threadData.ping > 0 ? threadData.ping + 'ms' : 'Failed'}
-╠══════════════════════════════╣
+╠═══════════════════════════╣
 💻 CPU: ${system.cpu.toFixed(1)}% ${createBar(system.cpu)}
 🧠 RAM: ${system.memory.toFixed(1)}% ${createBar(system.memory)}
    Total: ${system.totalMem}GB | Free: ${system.freeMem}GB
-╠══════════════════════════════╣
+╠═══════════════════════════╣
 ├─「𝐆𝐑𝐎𝐔𝐏 𝐈𝐍𝐅𝐎」
 │» Name: ${threadData.currentThread.name}
 │» ID: ${threadData.currentThread.id}
@@ -148,10 +148,10 @@ module.exports = {
 │» Admins: ${threadData.currentThread.adminCount}
 │» Messages: ${threadData.currentThread.messageCount}
 ${threadData.currentThread.adminNames.map(name => `│» • ${name}`).join('\n')}
-╠══════════════════════════════╣
+╠═══════════════════════════╣
 ⚙️ ${system.platform} ${system.arch}
 🔧 Prefix: ${config.prefix}
-╚══════════════════════════════╝
+╚═══════════════════════════╝
 `.trim(),
         attachment: videoSuccess ? fs.createReadStream(path.join(__dirname, 'status_video.mp4')) : undefined
       };
