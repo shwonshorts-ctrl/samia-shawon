@@ -40,8 +40,8 @@ module.exports = async function (api, threadModel, userModel, dashBoardModel, gl
 
         for (const folderModules of folders) {
                 const makeColor = folderModules == "cmds" ?
-                        createLine("BAYJID LOAD COMMANDS") :
-                        createLine("BAYJID LOAD COMMANDS EVENT");
+                        Createline("BADHON LOAD COMMANDS") :
+                        createLine("BADHON LOAD COMMANDS EVENT");
                 console.log(colors.hex("#f5ab00")(makeColor));
 
                 if (folderModules == "cmds") {
