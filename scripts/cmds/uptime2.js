@@ -1,168 +1,86 @@
 const os = require('os');
+const moment = require('moment');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 
-// Configuration
-const config = {
-  botName: "Melisa",
-  prefix: "^",
-  videoUrl: "https://files.catbox.moe/1osmny.mp4",
-  adminCount: 2,
-  whitelistCount: 2
-};
-
-// Helper Functions
-function formatTime(seconds) {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${days}d ${hours}h ${minutes}m ${secs}s`;
-}
-
-function createBar(percent, size = 10) {
-  const filled = "█".repeat(Math.round(percent * size / 100));
-  const empty = "░".repeat(size - Math.round(percent * size / 100));
-  return `${filled}${empty}`;
-}
-
-async function getDetailedThreadInfo(api, threadID) {
-  try {
-    const startTime = Date.now();
-    const threadInfo = await api.getThreadInfo(threadID);
-    
-    // Get participant count
-    const participants = threadInfo.participants || [];
-
-    // Get admin names
-    let adminNames = [];
-    if (threadInfo.adminIDs && threadInfo.adminIDs.length > 0) {
-      const adminInfo = await api.getUserInfo(threadInfo.adminIDs.map(a => a.id));
-      adminNames = threadInfo.adminIDs.map(admin => {
-        return adminInfo[admin.id]?.name || "Unknown Admin";
-      });
-    }
-
-    return {
-      currentThread: {
-        name: threadInfo.threadName || "Unnamed Group",
-        id: threadInfo.threadID,
-        participantCount: participants.length,
-        messageCount: threadInfo.messageCount || 0,
-        adminCount: threadInfo.adminIDs ? threadInfo.adminIDs.length : 0,
-        adminNames
-      },
-      ping: Date.now() - startTime
-    };
-  } catch (error) {
-    console.error("Thread info error:", error);
-    return {
-      currentThread: {
-        name: "Unknown Group",
-        id: "N/A",
-        participantCount: 0,
-        messageCount: 0,
-        adminCount: 2,
-        adminNames: [ BADHON ]
-      },
-      ping: -1
-    };
-  }
-}
-
-async function downloadVideo(filePath) {
-  try {
-    if (!fs.existsSync(filePath)) {
-      const writer = fs.createWriteStream(filePath);
-      const response = await axios({
-        url: config.videoUrl,
-        method: 'GET',
-        responseType: 'stream',
-        timeout: 15000
-      });
-      response.data.pipe(writer);
-      await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
-    }
-    return true;
-  } catch (error) {
-    console.error("Video download failed:", error);
-    return false;
-  }
-}
-
-// Main Command
 module.exports = {
   config: {
     name: "uptime2",
-    aliases: ["up2", "ut2"],
-    version: "5.4",
+    aliases: ["up2", "upt2", " uptime2", "st2"],
+    version: "1.1",
     author: "BADHON",
-    role: 0,
+    role: "admin",
+    shortDescription: "System Monitor with ",
+    longDescription: "Displays system information ",
     category: "system",
-    shortDescription: "Complete system and group status",
-    longDescription: "Shows detailed system stats and accurate group member information"
+    guide: "{pn}"
   },
 
-  onStart: async function({ api, event }) {
+  onStart: async function ({ api, event }) {
     try {
-      // Show loading message
-      const loadingMsg = await api.sendMessage("🔄 Preparing comprehensive system report...", event.threadID);
       
-      // Get all data in parallel
-      const [system, threadData, videoSuccess] = await Promise.all([
-        (async () => ({
-          uptime: process.uptime(),
-          cpu: os.loadavg()[0] * 10,
-          memory: (os.totalmem() - os.freemem()) / os.totalmem() * 100,
-          platform: os.platform(),
-          arch: os.arch(),
-          totalMem: (os.totalmem() / (1024 * 1024 * 1024)).toFixed(2),
-          freeMem: (os.freemem() / (1024 * 1024 * 1024)).toFixed(2)
-        }))(),
-        getDetailedThreadInfo(api, event.threadID),
-        downloadVideo(path.join(__dirname, 'status_video.mp4'))
-      ]);
-
-      // Create the detailed message
-      const message = {
-        body: `
-╔═══════════════════════════╗
-║  🍷 ${config.botName} System Monitor  ║
-╠═══════════════════════════╣
-🕒 System Uptime: ${formatTime(os.uptime())}
-🤖 Bot Uptime: ${formatTime(system.uptime)}
-📡 Ping: ${threadData.ping > 0 ? threadData.ping + 'ms' : 'Failed'}
-╠═══════════════════════════╣
-💻 CPU: ${system.cpu.toFixed(1)}% ${createBar(system.cpu)}
-🧠 RAM: ${system.memory.toFixed(1)}% ${createBar(system.memory)}
-   Total: ${system.totalMem}GB | Free: ${system.freeMem}GB
-╠═══════════════════════════╣
-├─「𝐆𝐑𝐎𝐔𝐏 𝐈𝐍𝐅𝐎」
-│» Name: ${threadData.currentThread.name}
-│» ID: ${threadData.currentThread.id}
-│» Members: ${threadData.currentThread.participantCount}
-│» Admins: ${threadData.currentThread.adminCount}
-│» Messages: ${threadData.currentThread.messageCount}
-${threadData.currentThread.adminNames.map(name => `│» • ${name}`).join('\n')}
-╠═══════════════════════════╣
-⚙️ ${system.platform} ${system.arch}
-🔧 Prefix: ${config.prefix}
-╚═══════════════════════════╝
-`.trim(),
-        attachment: videoSuccess ? fs.createReadStream(path.join(__dirname, 'status_video.mp4')) : undefined
+      const uptime = process.uptime();
+      const totalMem = os.totalmem();
+      const freeMem = os.freemem();
+      const usedMem = totalMem - freeMem;
+      const memoryUsage = (usedMem / totalMem * 100).toFixed(2);
+      
+      
+      const formatTime = (seconds) => {
+        const days = Math.floor(seconds / (3600 * 24));
+        const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${days}d ${hours}h ${minutes}m ${secs}s`;
       };
 
-      // Send the complete message
-      await api.unsendMessage(loadingMsg.messageID);
-      await api.sendMessage(message, event.threadID);
+      // Create progress bar
+      const createBar = (percent) => {
+        const filled = '█'.repeat(Math.round(percent / 5));
+        const empty = '░'.repeat(20 - Math.round(percent / 5));
+        return `[${filled}${empty}] ${percent}%`;
+      };
+
+      // Prepare the message
+      const message = `🖥️ 𝗦𝗬𝗦𝗧𝗘𝗠 𝗠𝗢𝗡𝗜𝗧𝗢𝗥\n\n` +
+        `⏳ 𝗨𝗣𝗧𝗜𝗠𝗘: ${formatTime(uptime)}\n` +
+        `🧠 𝗠𝗘𝗠𝗢𝗥𝗬: ${memoryUsage}% ${createBar(memoryUsage)}\n` +
+        `💾 𝗨𝗦𝗘𝗗: ${(usedMem / (1024 * 1024 * 1024)).toFixed(2)}GB\n` +
+        `🆓 𝗙𝗥𝗘𝗘: ${(freeMem / (1024 * 1024 * 1024)).toFixed(2)}GB\n` +
+        `📊 𝗧𝗢𝗧𝗔𝗟: ${(totalMem / (1024 * 1024 * 1024)).toFixed(2)}GB\n` +
+        `🖥️ 𝗖𝗣𝗨: ${os.cpus()[0].model}\n` +
+        `🏷️ 𝗢𝗦: ${os.platform()} ${os.arch()}`;
+
+      // Download and attach the video
+      const videoUrl = "https://files.catbox.moe/z38pzq.mp4";
+      const videoPath = path.join(__dirname, 'uptime_video.mp4');
+      
+      if (!fs.existsSync(videoPath)) {
+        const response = await axios({
+          method: 'GET',
+          url: videoUrl,
+          responseType: 'stream'
+        });
+        
+        const writer = fs.createWriteStream(videoPath);
+        response.data.pipe(writer);
+        
+        await new Promise((resolve, reject) => {
+          writer.on('finish', resolve);
+          writer.on('error', reject);
+        });
+      }
+
+      // Send message with video attachment
+      await api.sendMessage({
+        body: message,
+        attachment: fs.createReadStream(videoPath)
+      }, event.threadID);
 
     } catch (error) {
-      console.error("Command failed:", error);
-      await api.sendMessage("⚠️ Failed to generate complete system report", event.threadID);
+      console.error("Uptime command failed:", error);
+      await api.sendMessage("⚠️ Failed to get system information.", event.threadID);
     }
   }
 };
