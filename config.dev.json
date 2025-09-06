@@ -1,7 +1,7 @@
 {
 	"facebookAccount": {
-		"email": "brsgaming222@gmail.com",
-		"password": "284833543",
+		"email": "",
+		"password": "",
 		"2FASecret": "",
 		"i_user": "",
 		"proxy": null,
@@ -20,7 +20,7 @@
 	},
 	"adminBot": [
 		"61577762976884",
-                "",
+                "61557409693409",
 
 		"61571421696077"
 	],
@@ -45,7 +45,7 @@
 	},
   "database": {
     "type": "mongodb",
-    "uriMongodb": "mongodb+srv://bossbayjid14:sEo1K5APEmI3h9ke@cluster0.vombiex.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "uriMongodb": "mongodb+srv://bossbayjid14:bayjid110@cluster0.vombiex.mongodb.net/shawnbox?retryWrites=true&w=majority&appName=Cluster0",
     "autoSyncWhenStart": false,
     "autoRefreshThreadInfoFirstTime": true,
     "notes": "(1) type selects 'json' or 'sqlite' or 'mongodb'. If you choose mongodb, enter uri connect mongodb in the uriMongodb section, instructions to get uri connect mongodb at: https://youtu.be/z1f9urHW5xY. I recommend using 'mongodb' or 'sqlite', json is not recommended because it is not stable. (2) when you set autoSyncWhenStart to true, the bot will automatically synchronize the data in the database when starting the bot, this will make the bot start slower. (3) when you set autoRefreshThreadInfoFirstTime to true, the bot will automatically refresh the thread information when get first message from the thread since starting the bot"
@@ -89,7 +89,7 @@
 		"notes": "the value of timeInterval is seconds, url is the url you want to send the request to (automatically detected for hosting glitch or replit)"
 	},
 	"autoLoadScripts": {
-		"enable": false,
+		"enable": true,
 		"ignoreCmds": "",
 		"ignoreEvents": "",
 		"notes": "this feature will automatically load the script when scripts have been changed, you can set ignoreCmds to ignore commands, ignoreEvents to ignore events, separate by comma or space, example: \"cmd1.js cmd2.js cmd3.js\" (without backslash)"
